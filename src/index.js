@@ -5,10 +5,11 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import resolve from "vite-plugin-resolve";
 
 /**
+ * @param {{ aztecVersion?: string }} [options]
  * @returns {import("vite").Plugin<any>[]}
  */
-export function aztec() {
-  const aztecJsVersion = resolveAztecJsVersion();
+export function aztec({ aztecVersion } = {}) {
+  const aztecJsVersion = aztecVersion ?? resolveAztecJsVersion();
   return [
     {
       name: "vite-plugin-aztec",

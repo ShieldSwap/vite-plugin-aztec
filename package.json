@@ -1,6 +1,6 @@
 {
   "name": "@shieldswap/vite-plugin-aztec",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "main": "src/index.js",
   "module": "src/index.js",

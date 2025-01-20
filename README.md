@@ -13,8 +13,8 @@ npm install @shieldswap/vite-plugin-aztec -D
 `@aztec` packages versions must be pinned in order for this plugin to work correctly. So, remove `^` symbols from package.json:
 
 ```diff
-- "@aztec/aztec.js": "^0.52.0",
-+ "@aztec/aztec.js": "0.52.0",
+- "@aztec/aztec.js": "^0.71.0",
++ "@aztec/aztec.js": "0.71.0",
 ```
 
 And add `aztec` to your list of plugins:

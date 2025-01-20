@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-import picocolors from "picocolors";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import resolve from "vite-plugin-resolve";
 
@@ -8,8 +5,10 @@ import resolve from "vite-plugin-resolve";
  * @param {{ aztecVersion?: string }} [options]
  * @returns {import("vite").Plugin<any>[]}
  */
-export function aztec({ aztecVersion } = {}) {
-  const aztecJsVersion = aztecVersion ?? resolveAztecJsVersion();
+export function aztec({
+  /** Will serve @aztec/bb.js from unpkg.com if specified */
+  aztecVersion,
+} = {}) {
   return [
     {
       name: "vite-plugin-aztec",
@@ -29,10 +28,10 @@ export function aztec({ aztecVersion } = {}) {
         }
       },
     },
-    ...(process.env.NODE_ENV === "production"
+    ...(process.env.NODE_ENV === "production" && aztecVersion
       ? // TODO: this should be removed once `@aztec/bb.js` is back to normal size again
         resolve({
-          "@aztec/bb.js": `export * from "https://unpkg.com/@aztec/bb.js@${aztecJsVersion}/dest/browser/index.js"`,
+          "@aztec/bb.js": `export * from "https://unpkg.com/@aztec/bb.js@${aztecVersion}/dest/browser/index.js"`,
         })
       : []),
     nodePolyfills({
@@ -48,45 +47,6 @@ export function aztec({ aztecVersion } = {}) {
       ],
     }),
   ];
-}
-
-function resolveAztecJsVersion() {
-  /** @type {{ dependencies?: Record<string, string> }} */
-  const packageJson = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "package.json"), "utf-8"),
-  );
-
-  /** @type {string | undefined} */
-  let aztecJsVersion;
-  for (const [name, version] of Object.entries(
-    packageJson.dependencies ?? {},
-  )) {
-    if (!name.startsWith("@aztec/")) {
-      continue;
-    }
-    if (version.startsWith("^")) {
-      console.error(
-        `${name} is not installed correctly. Please specify the concrete version in order to avoid incompatibilities with other aztec packages.`,
-      );
-      const correctVersion = version.slice(1);
-      console.log(picocolors.bgRed(`- "${name}": "${version}"`));
-      console.log(picocolors.bgGreen(`+ "${name}": "${correctVersion}"`));
-      throw new Error();
-    }
-    if (!aztecJsVersion) {
-      aztecJsVersion = version;
-    } else if (aztecJsVersion !== version) {
-      throw new Error(
-        `Found incompatible @aztec packages versions: "${aztecJsVersion}" and "${version}"`,
-      );
-    }
-  }
-  if (!aztecJsVersion) {
-    throw new Error(
-      `Please install aztec.js: "npm install @aztec/aztec.js --save-exact"`,
-    );
-  }
-  return aztecJsVersion;
 }
 
 const MIN_SUPPORTED_TARGET = "ES2022";

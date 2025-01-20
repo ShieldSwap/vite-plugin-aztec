@@ -35,16 +35,7 @@ export function aztec({
         })
       : []),
     nodePolyfills({
-      include: [
-        "fs",
-        "buffer",
-        "util",
-        "crypto",
-        "path",
-        "stream",
-        "events",
-        "string_decoder",
-      ],
+      include: ["buffer", "process", "path"],
     }),
   ];
 }
